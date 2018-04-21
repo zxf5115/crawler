@@ -5,6 +5,6 @@
 
 # 代理IP地址获取
 
-使用的是 albert6378 的 pytools
+使用的是 GetFreeIP
 
-地址：https://github.com/albert6378/pytools
+地址：https://github.com/TurboWay/GetFreeIP
