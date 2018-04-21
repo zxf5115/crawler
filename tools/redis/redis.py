@@ -67,14 +67,14 @@ class Redis(object):
 
     try:
 
-      file = open(path, 'r')
-
       # 判断是否存在，如果存在删除内容
       self.handle.exists(field)
 
-      for line in file:
+      with open(path, 'r') as file:
 
-        self.handle.lpush(field, line)
+        for line in file:
+
+          self.handle.lpush(field, line)
 
       self.logger.info(message)
 

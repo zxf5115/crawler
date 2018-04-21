@@ -16,13 +16,14 @@ class File(object):
 
 
 
-
-
-  def open(self, path, operation, encoding='utf-8'):
+  def write(self, path, operation, content, encoding='utf-8'):
 
     try:
 
-      return self.handle = open(path, operation)
+      with open(path, operation, 1, encoding) as file:
+
+        f.writelines(content)
+        f.write('\n')
 
     except Exception as e:
 
@@ -32,11 +33,19 @@ class File(object):
 
 
 
-  def write(self, content):
+  def read(self, path, operation, encoding='utf-8'):
 
     try:
 
-      return self.handle.write(content)
+      lists = []
+
+      with open(path, operation, 1, 'utf-8') as file:
+
+        for line in file:
+
+          lists.append(line)
+
+      return lists
 
     except Exception as e:
 
@@ -45,40 +54,15 @@ class File(object):
 
 
 
-
-  def read(self, count = ''):
+  def clear(self, path, operation, encoding='utf-8'):
 
     try:
 
-      return self.handle.read(count)
+      with open(path, operation, 1, encoding) as file:
+
+        return file.truncate()
 
     except Exception as e:
 
       self.logger.error(e)
 
-
-
-
-  def clear(self):
-
-    try:
-
-      return self.handle.truncate()
-
-    except Exception as e:
-
-      self.logger.error(e)
-
-
-
-
-
-  def close(self):
-
-    try:
-
-      return self.handle.close()
-
-    except Exception as e:
-
-      self.logger.error(e)

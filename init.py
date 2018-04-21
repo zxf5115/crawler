@@ -11,8 +11,17 @@
 from tools.redis.redis import Redis
 from tools.config.conf import Conf
 from tools.log.logger import Logger
+from tools.ip.ip import Ip
+from tools.file.file import File
 
 class Init(object):
+
+
+  # def set_ip():
+
+
+
+
 
 
   def set_user_agent(self):
@@ -39,6 +48,8 @@ class Init(object):
 
     try:
 
+
+
       conf = Conf()
 
       # 得到日志信息，当前只有日志级别
@@ -50,12 +61,25 @@ class Init(object):
       # 初始化日志模块
       Logger.init(level)
 
+      print(ip)
       # 初始化Redis模块
       self.redis = Redis(host, port, Logger)
 
       self.set_user_agent()
 
-      self.set_ip_address()
+
+      # 获取文件操作对象
+      file = File(Logger)
+
+      ip_url = file.read('config/ip_url.ini', 'r')
+
+      # 生成可用代理IP
+      ip = Ip(Logger, ip_url)
+
+
+
+
+      # self.set_ip_address()
 
     except Exception as e:
 
