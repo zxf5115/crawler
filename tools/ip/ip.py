@@ -24,7 +24,7 @@ class Ip(object):
 
       url = self.ip_url[str(type)]+str(pagenum) # 配置url
 
-      headers = getheaders() # 定制请求头
+      headers = self.user_agent.get_user_agent() # 定制请求头
 
       html=requests.get(url=url,headers=headers,timeout = 5).text
 
@@ -48,9 +48,11 @@ class Ip(object):
 
 
 
-  def __init__(self, redis, logger, ip_url):
+  def __init__(self, redis, user_agent, logger, ip_url):
 
     self.redis = redis
+
+    self.user_agent = user_agent
 
     self.logger = logger
 

@@ -12,6 +12,7 @@ from tools.redis.redis import Redis
 from tools.config.conf import Conf
 from tools.log.logger import Logger
 from tools.ip.ip import Ip
+from tools.user_agent.user_agent import UserAgent
 from tools.file.file import File
 
 class Init(object):
@@ -26,11 +27,7 @@ class Init(object):
 
   def set_user_agent(self):
 
-    path = 'config/user_agent.ini'
-    field = 'user_agent'
-    message = 'User Agent 初始化完成'
 
-    self.redis.file_push(path, field, message)
 
 
 
@@ -53,19 +50,21 @@ class Init(object):
       conf = Conf()
 
       # 得到日志信息，当前只有日志级别
-      level = conf.get_log_info()
+      level = conf.get_log_conf_info()
 
       # 得到Redis配置信息
-      host, port = conf.get_redis_info()
+      host, port = conf.get_redis_conf_info()
 
       # 初始化日志模块
       Logger.init(level)
 
-      print(ip)
       # 初始化Redis模块
       self.redis = Redis(host, port, Logger)
 
-      self.set_user_agent()
+
+      user_agent = UserAgent(conf, self.redis, Logger)
+
+      user_agent.set_user_agent()
 
 
       # 获取文件操作对象
@@ -74,7 +73,7 @@ class Init(object):
       ip_url = file.read('config/ip_url.ini', 'r')
 
       # 生成可用代理IP
-      ip = Ip(Logger, ip_url)
+      ip = Ip(self.redis, Logger, ip_url)
 
 
 
