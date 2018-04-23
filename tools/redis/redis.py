@@ -1,27 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-#-------------------------------------------------------------------------
-#  程序：redis.py
-#  版本：1.0
-#  作者：zhangxiaofei
-#  日期：2018-04-20
-#  语言：Python 3.6.x
-#  操作：python redis.py
-#  功能：用于操作reids
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+# 程序：redis.py
+# 作者：zhangxiaofei
+# 日期：2018-04-20
+# 功能：用于操作reids
+# -------------------------------------------------------------------------
 
 import redis
 
 class Redis(object):
 
 
-  def __init__(self, host, port, logger):
+  # -----------------------------------------------------------------------
+  # 初始化方法
+
+  def __init__(self, conf, logger):
 
     try:
 
+      # 得到Redis配置信息
+      host, port = conf.get_redis_conf_info()
+
       # 打开连接
-      self.handle = redis.Redis(host=host, port=port)
+      self.handle = redis.Redis(host = host, port = port)
       self.logger = logger
 
     except Exception as e:
@@ -29,6 +32,8 @@ class Redis(object):
       self.logger.error(e)
 
 
+  # -----------------------------------------------------------------------
+  # 判断 字段是否存在，如果存在清空内容
 
   def exists(self, field):
 
@@ -36,6 +41,21 @@ class Redis(object):
 
         self.handle.delete(field)
 
+
+
+
+  # -----------------------------------------------------------------------
+  # 判断 list 长度
+
+  def llen(self, field):
+
+    return self.handle.llen(field)
+
+
+
+
+  # -----------------------------------------------------------------------
+  # 往 list 中 添加数据
 
   def lpush(self, field, value):
 
@@ -50,11 +70,25 @@ class Redis(object):
 
 
 
+  def sadd(self, field, value):
+
+    try:
+
+      # 打开连接
+      self.handle.sadd(field, value)
+
+    except Exception as e:
+
+      self.logger.error(e)
+
+  # -----------------------------------------------------------------------
+  # 从 list 中 随机取出数据
+
   def srandmember(self, field, number):
 
     try:
 
-      self.handle.srandmember(field, number)
+      return self.handle.srandmember(field, number)
 
     except Exception as e:
 
@@ -62,6 +96,8 @@ class Redis(object):
 
 
 
+  # -----------------------------------------------------------------------
+  # 从配置文件中读取信息保存到redis中
 
   def file_push(self, path, field, message):
 
@@ -74,19 +110,10 @@ class Redis(object):
 
         for line in file:
 
-          self.handle.lpush(field, line)
+          self.handle.sadd(field, line)
 
       self.logger.info(message)
 
     except Exception as e:
 
       self.logger.error(e)
-
-
-  # def update(self):
-
-  # def select(self):
-
-  # def remove(self):
-
-  # def close(self):

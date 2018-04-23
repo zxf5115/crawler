@@ -8,23 +8,55 @@
 # 功能：用于初始化数据
 # -------------------------------------------------------------------------
 
+import requests
+import threading
+from bs4 import BeautifulSoup
 
 from ..file.file import File
+from ..check.check import Check
+from ..datetime.datetime import Datetime
 
 class Ip(object):
 
+  # -----------------------------------------------------------------------
+  # 初始化可用 IP 代理地址
+
+  def init_ip_address():
+
+    self.redis.file_push(self.path, self.field, self.message)
 
 
 
 
   # -----------------------------------------------------------------------
-  # 获得可用IP地址
+  # 得到代理 IP 网站访问地址
 
-  def get_ip_address(type, pagenum, targeturl, save_path): # ip类型,页码,目标url,存放ip的路径
+  def get_proxy_ip_url(self):
 
-      url = self.ip_url[str(type)]+str(pagenum) # 配置url
+    # 读取代理 IP 网站的地址
+    return self.file.read(self.proxy_ip_url, 'r')
 
-      headers = self.user_agent.get_user_agent() # 定制请求头
+
+
+
+  # -----------------------------------------------------------------------
+  # 从代理 IP 网站上，获得可用IP地址
+
+  # ip类型,页码,目标url,存放ip的路径
+  def get_ip_address(self, category, page):
+
+    try:
+
+      ip_urls = self.get_proxy_ip_url()
+
+      "%s%d" % (ip_urls[0].strip(), 1)
+
+      url = "%s%d" % (ip_urls[category].strip(), page) # 配置url
+
+      # 随机获取一个 User Agent 信息
+      ua = self.user_agent.get_user_agent().strip()
+
+      headers = {'User-Agent': ua}
 
       html=requests.get(url=url,headers=headers,timeout = 5).text
 
@@ -37,18 +69,76 @@ class Ip(object):
           t=i.find_all('td')
 
           ip=t[1].text+':'+t[2].text
-
-          is_avail = checkip(targeturl,ip)
-
+          self.logger.info(ip)
+          is_avail = self.check.check_ip(self.validation_url, headers, ip)
+          self.logger.info(ip)
           if is_avail == True:
 
-              write(path=save_path,text=ip)
+              self.redis.lpush(self.field, ip)
 
-              print(ip)
+              self.logger.info(ip)
+
+    except Exception as e:
+
+      self.logger.error(e)
 
 
 
-  def __init__(self, redis, user_agent, logger, ip_url):
+
+  # -----------------------------------------------------------------------
+  # 多线程抓取ip入口
+
+  def get_ip(self):
+
+    try:
+
+      # 如果redis中存在代理ip数据，清空
+      self.redis.exists(self.field)
+
+      # 开始时间
+      start = Datetime.get_now_time()
+
+      threads = []
+
+      # 四种类型ip,每种类型取前三页,共12条线程
+      for category in range(1):
+
+        for page in range(1, 2):
+
+          t = threading.Thread(target = self.get_ip_address,
+                               args=(category, page))
+
+          threads.append(t)
+
+      self.logger.info('开始爬取代理ip')
+
+      for s in threads: # 开启多线程爬取
+         s.start()
+
+      for e in threads: # 等待所有线程结束
+         e.join()
+
+      self.logger.info('爬取完成')
+
+      end = Datetime.get_now_time() # 结束时间
+
+      diff = Datetime.get_time_diff(start, end)  # 计算耗时
+
+      # 读取爬到的ip数量
+      ips = self.redis.llen(self.field)
+
+      self.logger.info('一共爬取代理ip: %s 个,共耗时: %s \n' % (len(ips), diff))
+
+    except Exception as e:
+
+      self.logger.error(e)
+
+
+
+  # -----------------------------------------------------------------------
+  # 从代理 IP 网站上，获得可用IP地址
+
+  def __init__(self, redis, user_agent, conf, logger):
 
     self.redis = redis
 
@@ -56,84 +146,29 @@ class Ip(object):
 
     self.logger = logger
 
-    self.ip_url = ip_url
-
     self.file = File(self.logger)
 
+    self.path,\
+    self.field,\
+    self.message,\
+    self.proxy_ip_url,\
+    self.validation_url = conf.get_ip_conf_info()
+
+    self.check = Check(self.logger)
+
+    # 开始多线程抓取IP地址信息
+    self.get_ip()
+
+    # ua = self.user_agent.get_user_agent()
+    # self.logger.info(ua)
+
+    # ip_urls = self.get_proxy_ip_url()
+
+    # url = "%s%d" % (ip_urls[0].strip(), 1) # 配置url
+
+    # print(url)
 
 
-
-
-
-  # """
-  # 1、抓取西刺代理网站的代理ip
-  # 2、并根据指定的目标url,对抓取到ip的有效性进行验证
-  # 3、最后存到指定的path
-  # """
-
-  # # ------------------------------------------------------文档处理--------------------------------------------------------
-  # # 写入文档
-  # def write(path,text):
-  #     with open(path,'a', encoding='utf-8') as f:
-  #         f.writelines(text)
-  #         f.write('\n')
-  # # 清空文档
-  # def truncatefile(path):
-  #     with open(path, 'w', encoding='utf-8') as f:
-  #         f.truncate()
-  # # 读取文档
-  # def read(path):
-  #     with open(path, 'r', encoding='utf-8') as f:
-  #         txt = []
-  #         for s in f.readlines():
-  #             txt.append(s.strip())
-  #     return txt
-  # # ----------------------------------------------------------------------------------------------------------------------
-  # # 计算时间差,格式: 时分秒
-  # def gettimediff(start,end):
-  #     seconds = (end - start).seconds
-  #     m, s = divmod(seconds, 60)
-  #     h, m = divmod(m, 60)
-  #     diff = ("%02d:%02d:%02d" % (h, m, s))
-  #     return diff
-  # # ----------------------------------------------------------------------------------------------------------------------
-  # # 返回一个随机的请求头 headers
-  # def getheaders():
-  #     user_agent_list = [ \
-  #         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1" \
-  #         "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11", \
-  #         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6", \
-  #         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6", \
-  #         "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1", \
-  #         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5", \
-  #         "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5", \
-  #         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3", \
-  #         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3", \
-  #         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3", \
-  #         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24", \
-  #         "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"
-  #     ]
-  #     UserAgent=random.choice(user_agent_list)
-  #     headers = {'User-Agent': UserAgent}
-  #     return headers
-  # # -----------------------------------------------------检查ip是否可用----------------------------------------------------
-  # def checkip(targeturl,ip):
-  #     headers =getheaders()  # 定制请求头
-  #     proxies = {"http": "http://"+ip, "https": "http://"+ip}  # 代理ip
-  #     try:
-  #         response=requests.get(url=targeturl,proxies=proxies,headers=headers,timeout=5).status_code
-  #         if response == 200 :
-  #             return True
-  #         else:
-  #             return False
-  #     except:
-  #         return False
   # #-------------------------------------------------------获取代理方法----------------------------------------------------
   # # 免费代理 XiciDaili
   # def findip(type,pagenum,targeturl,path): # ip类型,页码,目标url,存放ip的路径

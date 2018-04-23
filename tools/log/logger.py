@@ -16,7 +16,10 @@ import logging
 class Logger(object):
 
   @classmethod
-  def init(cls, log_level = 'info'):
+  def init(cls, conf):
+
+    # 得到日志信息，当前只有日志级别
+    log_level = conf.get_log_conf_info()
 
     if log_level == 'debug':
 
@@ -31,7 +34,7 @@ class Logger(object):
         level = logging.WARNING
 
     logging.basicConfig(level=level,
-                        format="%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s",
+                        format="%(asctime)s %(module)s %(funcName)s[line:%(lineno)d] %(levelname)s %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S")
 
 

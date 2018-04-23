@@ -18,7 +18,23 @@ class Conf(object):
     self.conf = configparser.ConfigParser()
 
     # 读取配置文件
-    self.conf.read("config/config.ini")
+    self.conf.read("config/config.ini", encoding="utf-8")
+
+
+  # -----------------------------------------------------------------------
+  # 获取 获取IP 相关 配置信息
+
+  def get_ip_conf_info(self):
+
+    path    = self.conf.get('ip', 'path')
+    field   = self.conf.get('ip', 'field')
+    message = self.conf.get('ip', 'message')
+
+    proxy_ip_url = self.conf.get('ip', 'proxy_ip_url')
+    validation_url = self.conf.get('ip', 'validation_url')
+
+    return path, field, message, proxy_ip_url, validation_url
+
 
 
   # -----------------------------------------------------------------------

@@ -12,9 +12,9 @@ class UserAgent(object):
 
 
   # -----------------------------------------------------------------------
-  # 根据配置文件将 User Agent 保存到redis
+  # 初始化可用 User Agent 代理地址
 
-  set_user_agent(self):
+  def init_user_agent(self):
 
     self.redis.file_push(self.path, self.field, self.message)
 
@@ -24,7 +24,7 @@ class UserAgent(object):
   # -----------------------------------------------------------------------
   # 随机获取 User Agent
 
-  get_user_agent(self)
+  def get_user_agent(self):
 
     try:
 
@@ -34,7 +34,7 @@ class UserAgent(object):
 
     except Exception as e:
 
-      Logger.error(e)
+      self.logger.error(e)
 
     return data
 

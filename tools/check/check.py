@@ -8,24 +8,21 @@
 # 功能：用于初始化数据
 # -------------------------------------------------------------------------
 
-
-
+import requests
 
 class Check(object):
-
-
 
 
   # -----------------------------------------------------------------------
   # 检查IP是否可以使用
 
-  def check_ip(self, url, ip, headers):
+  def check_ip(self, targeturl, headers, ip_address):
 
-    proxies = {"http": "http://"+ip, "https": "http://"+ip}  # 代理ip
+    proxies = {"http": "http://"+ip_address, "https": "http://"+ip_address}  # 代理ip
 
     try:
 
-        response = requests.get(url=url, proxies = proxies, headers = headers, timeout = 5).status_code
+        response = requests.get(url=targeturl, proxies = proxies, headers = headers, timeout = 5).status_code
 
         if response == 200 :
 
