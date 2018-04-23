@@ -34,7 +34,7 @@ class Check(object):
 
     except Exception as e:
 
-        self.logger.error(e)
+        return False
 
 
 

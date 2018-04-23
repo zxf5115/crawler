@@ -47,9 +47,9 @@ class Redis(object):
   # -----------------------------------------------------------------------
   # 判断 list 长度
 
-  def llen(self, field):
+  def scard(self, field):
 
-    return self.handle.llen(field)
+    return self.handle.scard(field)
 
 
 
