@@ -8,12 +8,13 @@
 # 功能：用于初始化数据
 # -------------------------------------------------------------------------
 
-from tools.redis.redis import Redis
-from tools.conf.conf import Conf
 import logging
+
 from tools.ip.ip import Ip
-from tools.user_agent.user_agent import UserAgent
+from tools.conf.conf import Conf
 from tools.file.file import File
+from tools.redis.redis import Redis
+from tools.user_agent.user_agent import UserAgent
 
 class Init(object):
 

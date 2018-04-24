@@ -26,11 +26,39 @@ class Conf(object):
   # -----------------------------------------------------------------------
   # 获取 获取IP 相关 配置信息
 
+  def get_header_conf_info(self):
+
+    header = self.conf.get('header', 'header')
+
+    return header
+
+
+
+
+  # -----------------------------------------------------------------------
+  # 获取 获取IP 相关 配置信息
+
   def get_crawler_conf_info(self):
 
     url = self.conf.get('crawler', 'url')
+    page = self.conf.getint('crawler', 'page')
 
-    return url
+    return url,page
+
+
+
+
+  # -----------------------------------------------------------------------
+  # 获取 获取IP 相关 配置信息中的 字段信息
+
+  def get_ip_field_conf_info(self):
+
+    field   = self.conf.get('ip', 'field')
+
+    return field
+
+
+
 
   # -----------------------------------------------------------------------
   # 获取 获取IP 相关 配置信息
@@ -45,6 +73,19 @@ class Conf(object):
     validation_url = self.conf.get('ip', 'validation_url')
 
     return path, field, message, proxy_ip_url, validation_url
+
+
+
+
+  # -----------------------------------------------------------------------
+  # 获取 User Agent 配置中的 字段信息
+
+  def get_user_agent_field_conf_info(self):
+
+    field   = self.conf.get('user_agent', 'field')
+
+    return field
+
 
 
 

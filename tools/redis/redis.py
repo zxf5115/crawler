@@ -88,7 +88,7 @@ class Redis(object):
   # -----------------------------------------------------------------------
   # 从 set 中 随机取出数据
 
-  def srandmember(self, field, number):
+  def srandmember(self, field, number = 1):
 
     try:
 
