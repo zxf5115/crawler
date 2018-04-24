@@ -44,7 +44,7 @@ class Crawler(object):
   # -----------------------------------------------------------------------
   # 得到页面数据
 
-  def get_html_info(self, url):
+  def get_html_info(self, url, field):
 
     try:
 
@@ -61,8 +61,6 @@ class Crawler(object):
 
       proxy = { "http": "http://"+ip_address, "https": "http://"+ip_address}
 
-
-
       # 随机获取 user agent 信息
       user_agent = self.redis.srandmember(user_agent_field)
 
@@ -72,14 +70,14 @@ class Crawler(object):
       # 得到真实header头信息
       header = self.get_headers(user_agent)
 
-      html = requests.get(url, headers = header, proxies=proxy, timeout=20).text
+      html = requests.get(url, headers = header, proxies=proxy, timeout=30).text
 
       soup=BeautifulSoup(html,'html.parser')
 
       data = soup.find_all('div', class_ = 'hy_companylist')
 
 
-      self.redis.lpush('page_info', data)
+      self.redis.sadd(field, data)
 
       # return html
 
@@ -90,6 +88,8 @@ class Crawler(object):
 
 
 
+  # -----------------------------------------------------------------------
+  # 多线程抓取数据
 
   def run(self):
 
@@ -106,16 +106,18 @@ class Crawler(object):
         url = "%s%d" % (self.url,vo)
 
         t = threading.Thread(target = self.get_html_info,
-                             args=(url,))
+                             args=(url,vo))
 
         threads.append(t)
 
       self.logger.info('开始爬取数据')
 
-      for thread_start in threads: # 开启多线程爬取
+      # 开启多线程爬取
+      for thread_start in threads:
         thread_start.start()
 
-      for thread_end in threads: # 等待所有线程结束
+      # 等待所有线程结束
+      for thread_end in threads:
         thread_end.join()
 
       self.logger.info('爬取完成')
@@ -132,10 +134,6 @@ class Crawler(object):
     except Exception as e:
 
       self.logger.error(e)
-
-
-
-
 
 
 

@@ -18,7 +18,7 @@ user agent 也保存到了 redis 中
 根据代理ip 和 user agent 使用多线程 进行 企业黄页抓取
 
 抓取公司黄页数据
-![Redis 中存储的 企业基本信息](https://github.com/zxf5115/crawler/master/document/2.png)
 
+![Redis 中存储的 企业基本信息](https://github.com/zxf5115/crawler/blob/master/document/2.png)
 
 剩下的待写！！！
