@@ -19,5 +19,6 @@ user agent 也保存到了 redis 中
 
 抓取公司黄页数据
 ![Redis 中存储的 企业基本信息](https://github.com/zxf5115/crawler/master/document/2.png)
-![Redis 中存储的 企业基本信息](https://github.com/zxf5115/crawler/blob/master/document/2.png)
+
+
 剩下的待写！！！
