@@ -32,6 +32,8 @@ class Redis(object):
       self.logger.error(e)
 
 
+
+
   # -----------------------------------------------------------------------
   # 判断 字段是否存在，如果存在清空内容
 
@@ -69,6 +71,8 @@ class Redis(object):
       self.logger.error(e)
 
 
+  # -----------------------------------------------------------------------
+  # 给 set 中 添加数据
 
   def sadd(self, field, value):
 
@@ -82,7 +86,7 @@ class Redis(object):
       self.logger.error(e)
 
   # -----------------------------------------------------------------------
-  # 从 list 中 随机取出数据
+  # 从 set 中 随机取出数据
 
   def srandmember(self, field, number):
 
