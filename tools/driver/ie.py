@@ -15,7 +15,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-class Driver(object):
+class Driver:
 
 
   def set_firefox_driver(self):

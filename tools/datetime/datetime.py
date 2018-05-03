@@ -10,7 +10,7 @@
 
 import datetime
 
-class Datetime(object):
+class Datetime:
 
   # -----------------------------------------------------------------------
   # 得到当前时间

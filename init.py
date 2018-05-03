@@ -16,7 +16,7 @@ from tools.file.file import File
 from tools.redis.redis import Redis
 from tools.user_agent.user_agent import UserAgent
 
-class Init(object):
+class Init:
 
 
   def get_level(self, conf):

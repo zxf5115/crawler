@@ -17,7 +17,7 @@ from ..conf.conf import Conf
 from ..redis.redis import Redis
 from ..datetime.datetime import Datetime
 
-class Crawler(object):
+class Crawler:
 
 
   # -----------------------------------------------------------------------

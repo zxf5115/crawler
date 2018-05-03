@@ -16,7 +16,7 @@ from ..file.file import File
 from ..check.check import Check
 from ..datetime.datetime import Datetime
 
-class Ip(object):
+class Ip:
 
   # -----------------------------------------------------------------------
   # 初始化可用 IP 代理地址

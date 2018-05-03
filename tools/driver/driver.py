@@ -12,7 +12,7 @@ import ie
 import chrome
 import firefox
 
-class Driver(object):
+class Driver:
 
 
 
